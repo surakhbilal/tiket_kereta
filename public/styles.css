@@ -2173,45 +2173,443 @@ body.dark-mode .price-row.discount-row {
   text-align: center;
 }
 
-/* Responsive */
-@media (max-width: 1040px) {
+/* Mobile Bottom Navigation Bar (Hidden on Desktop) */
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN (TABLET & MOBILE ALL DEVICES)
+   ============================================================ */
+
+/* 1. Tablet & Compact Laptop (<= 1080px) */
+@media (max-width: 1080px) {
+  body {
+    padding-bottom: 68px;
+  }
+
+  .container {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  /* Keep Top Navbar on 1 clean single row */
   .navbar-inner {
-    height: auto;
-    padding: 12px 0;
-    flex-wrap: wrap;
+    height: 64px;
+    padding-top: 0;
+    padding-bottom: 0;
+    flex-wrap: nowrap;
   }
+
+  /* Hide wide center pill bar on tablet/mobile and activate fixed bottom app bar */
   .nav-links {
-    order: 3;
-    width: 100%;
-    overflow-x: auto;
-    justify-content: flex-start;
-  }
-  .search-grid,
-  .search-grid.roundtrip-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  .swap-btn-wrap {
     display: none;
   }
-  .date-strip {
-    grid-template-columns: repeat(3, 1fr);
+
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--surface-card);
+    border-top: 1px solid var(--border-base);
+    box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.1);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    z-index: 80;
+    padding: 4px 6px;
   }
+
+  .mobile-nav-item {
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+  }
+
+  .mobile-nav-item.active {
+    color: var(--blue-500);
+    font-weight: 800;
+    background: var(--blue-50);
+  }
+
+  body.dark-mode .mobile-nav-item.active {
+    color: #60a5fa;
+  }
+
+  .mobile-nav-icon-badge {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .mobile-badge-dot {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background: var(--orange-600);
+    color: #ffffff;
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 0 5px;
+    border-radius: 999px;
+    line-height: 1.4;
+  }
+
+  /* Tablet Search Grid: 2 Columns with clean spacing */
+  .search-grid,
+  .search-grid.roundtrip-grid {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  /* Date strip becomes smooth horizontal swipe bar without scrollbar */
+  .date-strip {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .date-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .date-pill-btn {
+    flex: 0 0 108px;
+  }
+
+  /* Filter sidebar becomes compact horizontal top filter bar on tablet/mobile */
   .search-workspace {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
-  .schedule-card {
+
+  .filter-card {
+    padding: 14px 16px;
+  }
+
+  .time-filter-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .time-chip {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 7px 10px;
+  }
+
+  .benefit-list {
+    display: none;
+  }
+
+  .booking-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .features-strip {
     grid-template-columns: 1fr;
     gap: 12px;
   }
+}
+
+/* 2. Mobile Phones (<= 680px) */
+@media (max-width: 680px) {
+  .container {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  /* Ultra-clean 1-line topbar on phones */
+  .topbar {
+    font-size: 0.72rem;
+    padding: 5px 0;
+  }
+
+  .topbar-left span:not(.verified-badge),
+  .topbar-right .topbar-sep,
+  .topbar-right .topbar-link {
+    display: none;
+  }
+
+  .topbar-inner {
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  /* Compact Single-Row Navbar on Phones */
+  .navbar-inner {
+    height: 58px;
+    gap: 8px;
+  }
+
+  .brand-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+  }
+
+  .brand-logo svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .brand-title {
+    font-size: 1.12rem;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  /* Icon-only theme toggle on mobile to save navbar space */
+  .theme-label-text {
+    display: none;
+  }
+
+  .theme-toggle-btn {
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+
+  .profile-trigger-btn {
+    padding: 4px 8px 4px 5px;
+    gap: 7px;
+  }
+
+  .profile-badge-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 0.72rem;
+  }
+
+  .profile-trigger-name {
+    max-width: 105px;
+    font-size: 0.78rem;
+  }
+
+  .profile-trigger-points {
+    font-size: 0.66rem;
+  }
+
+  /* Compact Hero & Fluid Heading */
+  .hero-banner {
+    padding: 20px 0 28px;
+  }
+
+  .hero-pill {
+    font-size: 0.73rem;
+    padding: 4px 11px;
+    margin-bottom: 10px;
+  }
+
+  .hero-text h1 {
+    font-size: clamp(1.32rem, 5.5vw, 1.7rem);
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+
+  .hero-text p {
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+    line-height: 1.45;
+  }
+
+  /* Mobile Search Card: Full-width Stations so names never cut off */
+  .search-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .search-grid,
+  .search-grid.roundtrip-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Origin, Swap Button, and Destination span full width on mobile */
+  .search-grid > .form-group:nth-child(1),
+  .search-grid > .form-group:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
+  .swap-btn-wrap {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    margin: -6px 0;
+    padding: 0 8px;
+    z-index: 2;
+  }
+
+  .swap-btn {
+    width: 34px;
+    height: 34px;
+    transform: rotate(90deg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .swap-btn:hover {
+    transform: rotate(270deg);
+  }
+
+  .search-footer {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 14px;
+    padding-top: 12px;
+    gap: 12px;
+  }
+
+  .quick-routes {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .quick-routes::-webkit-scrollbar {
+    display: none;
+  }
+
+  .quick-label,
+  .chip-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .search-submit-btn {
+    width: 100%;
+    padding: 12px;
+  }
+
+  /* Section & Schedule Cards on Mobile */
+  .section-block {
+    padding: 18px 14px 36px;
+  }
+
+  .results-header h2,
+  .page-header-bar h2 {
+    font-size: 1.15rem;
+  }
+
+  .schedule-card {
+    grid-template-columns: 1fr;
+    padding: 15px;
+    gap: 14px;
+  }
+
+  /* Keep Route Timeline Horizontal on Mobile */
+  .route-timeline {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-base);
+    padding: 10px 12px;
+    border-radius: 10px;
+    gap: 10px;
+  }
+
+  .time-point .time {
+    font-size: 1.12rem;
+  }
+
+  .time-point .station {
+    font-size: 0.78rem;
+  }
+
+  /* Price and Action Button side by side on bottom of card */
   .price-seat-col {
     text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 4px;
+    border-top: 1px dashed var(--border-base);
   }
-  .features-strip,
-  .help-grid,
-  .footer-grid,
-  .booking-layout,
+
+  .schedule-card > div:last-child .btn {
+    width: 100%;
+  }
+
+  .schedule-card-footer {
+    padding: 8px 15px;
+  }
+
+  /* My Bookings, Promos, Help & Footer on Mobile */
+  .booking-item-card {
+    padding: 15px;
+  }
+
   .booking-item-body {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .booking-actions {
+    justify-content: stretch;
+  }
+
+  .booking-actions .btn {
+    flex: 1;
+  }
+
+  .help-grid,
+  .footer-grid,
+  .form-row-2,
+  .form-row-3,
+  .addons-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Modals on Mobile */
+  .modal-backdrop {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .modal-dialog {
+    max-height: 92vh;
+    border-radius: 16px 16px 12px 12px;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 14px 16px;
+  }
+
+  .eticket-top-grid {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+
+  .eticket-top-grid > div:first-child {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .toast-container {
+    bottom: 74px;
+    left: 14px;
+    right: 14px;
+  }
+
+  .toast {
+    max-width: 100%;
   }
 }
 

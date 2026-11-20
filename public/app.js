@@ -209,12 +209,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 // Tab Navigation
 function switchTab(tabName) {
   document.querySelectorAll('.tab-panel').forEach((el) => el.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach((el) => {
+  document.querySelectorAll('.nav-item, .mobile-nav-item').forEach((el) => {
     el.classList.toggle('active', el.getAttribute('data-tab') === tabName);
   });
 
   const target = document.getElementById(`tab-${tabName}`);
   if (target) target.classList.add('active');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (tabName === 'schedules') {
     loadScheduleDirectory();
@@ -1393,6 +1395,8 @@ async function loadMyBookings() {
   const data = await apiFetch('/api/bookings');
   state.myBookings = data.bookings || [];
   document.getElementById('nav-ticket-badge').textContent = state.myBookings.length;
+  const mobileBadge = document.getElementById('mobile-ticket-badge');
+  if (mobileBadge) mobileBadge.textContent = state.myBookings.length;
   renderMyBookingsList();
 }
 
