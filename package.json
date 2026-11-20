@@ -1,0 +1,20 @@
+{
+  "name": "keretakita-ticketing",
+  "version": "1.0.0",
+  "description": "Aplikasi Web Pemesanan Tiket Kereta Api Full-Stack dengan Node.js dan SQLite",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "db:view": "node scripts/view-db.js",
+    "db:reset": "node scripts/view-db.js --reset"
+  },
+  "keywords": [
+    "train",
+    "ticketing",
+    "kereta-api",
+    "sqlite",
+    "fullstack"
+  ],
+  "license": "MIT"
+}

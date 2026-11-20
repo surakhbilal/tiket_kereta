@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KeretaKita — Pesan Tiket Kereta Api Resmi, Cepat &amp; Nyaman</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=4" />
+</head>
+<body>
+  <!-- Top Customer Service Bar -->
+  <div class="topbar no-print">
+    <div class="container topbar-inner">
+      <div class="topbar-left">
+        <span class="verified-badge">&#10003; Mitra Resmi Reservasi Kereta Api</span>
+        <span class="topbar-sep">&bull;</span>
+        <span>Bebas pilih kursi &amp; jaminan E-Ticket resmi</span>
+      </div>
+      <div class="topbar-right">
+        <span>Layanan Pelanggan 24 Jam: <strong>121 / (021) 121</strong></span>
+        <span class="topbar-sep">|</span>
+        <button type="button" class="topbar-link" onclick="switchTab('help')">Panduan &amp; Bantuan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Header / Navbar -->
+  <header class="navbar no-print">
+    <div class="container navbar-inner">
+      <a href="#" class="brand" onclick="switchTab('search'); return false;">
+        <div class="brand-logo">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="3" width="16" height="15" rx="2.5"/>
+            <path d="M4 11h16"/>
+            <path d="M12 3v8"/>
+            <path d="m8 18-2 3"/>
+            <path d="m16 18 2 3"/>
+            <circle cx="8.5" cy="14.5" r="1"/>
+            <circle cx="15.5" cy="14.5" r="1"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Kereta<span class="brand-accent">Kita</span></span>
+          <span class="brand-subtitle">Perjalanan Nyaman Seluruh Nusantara</span>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <button type="button" class="nav-item active" data-tab="search" onclick="switchTab('search')">
+          Cari &amp; Pesan Tiket
+        </button>
+        <button type="button" class="nav-item" data-tab="schedules" onclick="switchTab('schedules')">
+          Jadwal &amp; Rute
+        </button>
+        <button type="button" class="nav-item" data-tab="promos" onclick="switchTab('promos')">
+          Promo &amp; Voucher
+          <span class="badge-new">Hemat</span>
+        </button>
+        <button type="button" class="nav-item" data-tab="my-tickets" onclick="switchTab('my-tickets')">
+          Tiket Saya
+          <span id="nav-ticket-badge" class="badge-pill">0</span>
+        </button>
+        <button type="button" class="nav-item" data-tab="help" onclick="switchTab('help')">
+          Pusat Bantuan
+        </button>
+      </nav>
+
+      <div class="nav-right-controls">
+        <button
+          type="button"
+          id="theme-toggle-btn"
+          class="theme-toggle-btn"
+          onclick="toggleTheme()"
+          title="Ubah Mode Gelap / Terang"
+        >
+          <span id="theme-icon" class="theme-icon-wrap"></span>
+          <span id="theme-label">Gelap</span>
+        </button>
+        <div class="nav-auth" id="nav-auth-area">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Notification -->
+  <div id="toast-container" class="toast-container no-print"></div>
+
+  <!-- Main Content -->
+  <main class="main-content no-print">
+    <!-- TAB 1: BERANDA & PENCARIAN TIKET -->
+    <section id="tab-search" class="tab-panel active">
+      <div class="hero-banner">
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-text">
+              <div class="hero-pill">
+                <span>&#9733; Promo Spesial Hari Ini: Gunakan kode <strong>KERETAHEMAT</strong> potongan Rp 50.000</span>
+              </div>
+              <h1>Perjalanan Kereta Api Lebih Mudah, Cepat &amp; Terencana</h1>
+              <p>Pesan tiket kereta api antar kota, pilih kursi favorit Anda di gerbong, pesan kuliner perjalanan, dan dapatkan Boarding Pass instan.</p>
+            </div>
+          </div>
+
+          <!-- Search Box Card -->
+          <div class="search-card">
+            <form id="search-form" onsubmit="handleSearchSubmit(event)">
+              <!-- Trip Type Bar -->
+              <div class="search-top-bar">
+                <div class="trip-type-toggle">
+                  <label class="radio-pill active" id="pill-oneway">
+                    <input type="radio" name="trip_type" value="oneway" checked onchange="toggleTripType('oneway')" />
+                    <span>Sekali Jalan</span>
+                  </label>
+                  <label class="radio-pill" id="pill-roundtrip">
+                    <input type="radio" name="trip_type" value="roundtrip" onchange="toggleTripType('roundtrip')" />
+                    <span>Pulang-Pergi (PP)</span>
+                  </label>
+                </div>
+                <div class="active-voucher-pill" id="search-active-promo-indicator">
+                  <!-- Shows if user selected a promo voucher -->
+                </div>
+              </div>
+
+              <div class="search-grid" id="search-grid-container">
+                <div class="form-group">
+                  <label for="search-origin">Stasiun Keberangkatan</label>
+                  <select id="search-origin" class="form-control">
+                    <option value="ALL">Semua Stasiun Asal</option>
+                  </select>
+                </div>
+
+                <div class="swap-btn-wrap">
+                  <button type="button" class="swap-btn" title="Tukar Stasiun Asal & Tujuan" onclick="swapStations()">
+                    &#8644;
+                  </button>
+                </div>
+
+                <div class="form-group">
+                  <label for="search-destination">Stasiun Tujuan</label>
+                  <select id="search-destination" class="form-control">
+                    <option value="ALL">Semua Stasiun Tujuan</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="search-date">Tanggal Pergi</label>
+                  <input type="date" id="search-date" class="form-control" onchange="onSearchDateChanged()" required />
+                </div>
+
+                <div class="form-group hidden" id="return-date-group">
+                  <label for="search-return-date">Tanggal Pulang</label>
+                  <input type="date" id="search-return-date" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                  <label for="search-class">Kelas Kereta</label>
+                  <select id="search-class" class="form-control">
+                    <option value="ALL">Semua Kelas</option>
+                    <option value="Eksekutif">Eksekutif</option>
+                    <option value="Luxury">Luxury / Sleeper</option>
+                    <option value="Bisnis">Bisnis</option>
+                    <option value="Ekonomi">Ekonomi</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="search-passengers">Penumpang</label>
+                  <select id="search-passengers" class="form-control">
+                    <option value="1">1 Penumpang</option>
+                    <option value="2">2 Penumpang</option>
+                    <option value="3">3 Penumpang</option>
+                    <option value="4">4 Penumpang</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="search-footer">
+                <div class="quick-routes">
+                  <span class="quick-label">Rute Favorit:</span>
+                  <button type="button" class="chip-btn" onclick="applyQuickRoute('GMR', 'BD')">Jakarta &rarr; Bandung</button>
+                  <button type="button" class="chip-btn" onclick="applyQuickRoute('GMR', 'YK')">Jakarta &rarr; Yogyakarta</button>
+                  <button type="button" class="chip-btn" onclick="applyQuickRoute('GMR', 'SBI')">Jakarta &rarr; Surabaya</button>
+                  <button type="button" class="chip-btn" onclick="applyQuickRoute('PSE', 'YK')">Pasar Senen &rarr; Yogyakarta</button>
+                  <button type="button" class="chip-btn" onclick="applyQuickRoute('BD', 'YK')">Bandung &rarr; Yogyakarta</button>
+                  <button type="button" class="chip-btn" onclick="applyQuickRoute('YK', 'SGU')">Yogyakarta &rarr; Surabaya</button>
+                  <button type="button" class="chip-btn" onclick="applyQuickRoute('ALL', 'ALL')">Semua Rute</button>
+                </div>
+
+                <button type="submit" class="btn btn-accent btn-lg search-submit-btn">
+                  Cari Tiket Kereta
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7-Day Interactive Date Strip & Results Workspace -->
+      <div class="container section-block">
+        <!-- Quick 7-Day Date Selector -->
+        <div id="date-strip-container" class="date-strip">
+          <!-- Rendered by JS -->
+        </div>
+
+        <div class="search-workspace">
+          <!-- Left Sidebar Filters -->
+          <aside class="filter-sidebar">
+            <div class="card filter-card">
+              <div class="filter-card-header">
+                <h3>Filter &amp; Urutkan</h3>
+                <button type="button" class="link-btn text-sm" onclick="resetSearchFilters()">Reset</button>
+              </div>
+
+              <div class="filter-group">
+                <label class="filter-title">Urutkan Jadwal</label>
+                <select id="filter-sort" class="form-control form-control-sm" onchange="renderScheduleResults()">
+                  <option value="dep_asc">Keberangkatan Paling Awal</option>
+                  <option value="price_asc">Harga Terendah</option>
+                  <option value="price_desc">Harga Tertinggi</option>
+                  <option value="dep_desc">Keberangkatan Paling Malam</option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label class="filter-title">Waktu Keberangkatan</label>
+                <div class="time-filter-grid">
+                  <button type="button" class="time-chip active" data-time="ALL" onclick="setTimeFilter('ALL')">
+                    Semua Waktu
+                  </button>
+                  <button type="button" class="time-chip" data-time="PAGI" onclick="setTimeFilter('PAGI')">
+                    Pagi (00:00 - 11:59)
+                  </button>
+                  <button type="button" class="time-chip" data-time="SIANG" onclick="setTimeFilter('SIANG')">
+                    Siang (12:00 - 14:59)
+                  </button>
+                  <button type="button" class="time-chip" data-time="SORE" onclick="setTimeFilter('SORE')">
+                    Sore (15:00 - 17:59)
+                  </button>
+                  <button type="button" class="time-chip" data-time="MALAM" onclick="setTimeFilter('MALAM')">
+                    Malam (18:00 - 23:59)
+                  </button>
+                </div>
+              </div>
+
+              <div class="filter-group">
+                <label class="filter-title">Keunggulan Layanan</label>
+                <ul class="benefit-list">
+                  <li>&#10003; Bebas Pilih Kursi Gerbong</li>
+                  <li>&#10003; Bisa Ubah Jadwal (Reschedule)</li>
+                  <li>&#10003; Boarding Pass QR Resmi</li>
+                  <li>&#10003; Pre-Order Kuliner Kereta</li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Right Results Column -->
+          <div class="results-main">
+            <div class="results-header">
+              <div>
+                <h2 id="results-title">Jadwal Kereta Api Tersedia</h2>
+                <p id="results-subtitle" class="text-muted">Pilih jadwal keberangkatan yang sesuai dengan rencana perjalanan Anda.</p>
+              </div>
+            </div>
+
+            <div id="schedule-results-list" class="schedule-list">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Value Proposition Cards -->
+        <div class="features-strip">
+          <div class="feature-box">
+            <div class="feature-icon">&#128186;</div>
+            <div>
+              <h4>Pilih Kursi Sesuai Keinginan</h4>
+              <p>Lihat denah gerbong secara langsung dan pilih kursi dekat jendela atau lorong tanpa biaya tambahan.</p>
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-icon">&#127857;</div>
+            <div>
+              <h4>Pre-Order Kuliner Restorasi</h4>
+              <p>Pesan hidangan favorit khas perjalanan kereta api sejak awal, diantar hangat langsung ke kursi Anda.</p>
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-icon">&#128179;</div>
+            <div>
+              <h4>Pembayaran Aman &amp; Instan</h4>
+              <p>Mendukung Virtual Account BCA, Mandiri, BRI, QRIS, dan E-Wallet dengan penerbitan E-Ticket otomatis.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: JADWAL & RUTE LENGKAP -->
+    <section id="tab-schedules" class="tab-panel">
+      <div class="container section-block">
+        <div class="page-header-bar">
+          <div>
+            <h2>Jadwal &amp; Rute Kereta Api Nasional</h2>
+            <p class="text-muted">Informasi lengkap jam keberangkatan, estimasi waktu tempuh, fasilitas, dan tarif resmi.</p>
+          </div>
+          <div class="filter-inline">
+            <input type="text" id="directory-filter-input" class="form-control" placeholder="Cari nama kereta, stasiun, atau kota..." oninput="renderScheduleDirectory()" />
+          </div>
+        </div>
+
+        <div class="card table-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>No. KA</th>
+                  <th>Nama Kereta Api</th>
+                  <th>Kelas Layanan</th>
+                  <th>Keberangkatan</th>
+                  <th>Tujuan</th>
+                  <th>Jam Berangkat</th>
+                  <th>Jam Tiba</th>
+                  <th>Durasi</th>
+                  <th>Harga Tiket</th>
+                  <th>Ketersediaan</th>
+                  <th>Pemesanan</th>
+                </tr>
+              </thead>
+              <tbody id="directory-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: PROMO & VOUCHER -->
+    <section id="tab-promos" class="tab-panel">
+      <div class="container section-block">
+        <div class="page-header-bar">
+          <div>
+            <h2>Promo &amp; Voucher Perjalanan Kereta Api</h2>
+            <p class="text-muted">Gunakan kode voucher di bawah ini saat pemesanan untuk mendapatkan potongan harga langsung.</p>
+          </div>
+        </div>
+
+        <div id="promos-grid-container" class="promos-grid">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: TIKET SAYA & CEK PESANAN -->
+    <section id="tab-my-tickets" class="tab-panel">
+      <div class="container section-block">
+        <div class="page-header-bar">
+          <div>
+            <h2>Cek Pesanan &amp; Tiket Saya</h2>
+            <p class="text-muted">Kelola jadwal perjalanan Anda, tampilkan Boarding Pass QR, ubah tanggal keberangkatan, atau cetak E-Ticket.</p>
+          </div>
+        </div>
+
+        <!-- PNR Lookup Box -->
+        <div class="card pnr-lookup-card">
+          <form onsubmit="handlePnrLookup(event)" class="pnr-form">
+            <div class="pnr-input-group">
+              <label for="pnr-search-input">Cek Pesanan dengan Kode Booking (PNR):</label>
+              <div class="pnr-row">
+                <input
+                  type="text"
+                  id="pnr-search-input"
+                  class="form-control"
+                  placeholder="Masukkan Kode Booking (Contoh: KAI-8F92A1)"
+                />
+                <button type="submit" class="btn btn-primary">Cari Pesanan</button>
+                <button type="button" class="btn btn-outline" onclick="loadMyBookings()">Tampilkan Semua Tiket Saya</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div id="my-bookings-list" class="bookings-grid">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: PUSAT BANTUAN & PANDUAN -->
+    <section id="tab-help" class="tab-panel">
+      <div class="container section-block">
+        <div class="page-header-bar">
+          <div>
+            <h2>Pusat Bantuan &amp; Informasi Perjalanan</h2>
+            <p class="text-muted">Panduan lengkap pemesanan tiket, ketentuan boarding stasiun, perubahan jadwal, dan pembatalan tiket.</p>
+          </div>
+        </div>
+
+        <div class="help-grid">
+          <div class="card help-card">
+            <h3>1. Cara Memesan Tiket &amp; Memilih Kursi</h3>
+            <p>Pilih stasiun asal, stasiun tujuan, tanggal keberangkatan, dan jumlah penumpang di halaman utama. Klik <strong>Pilih Tiket</strong> pada kereta yang diinginkan, isi data identitas (KTP/NIK), lalu klik nomor kursi yang tersedia pada denah gerbong interaktif.</p>
+          </div>
+          <div class="card help-card">
+            <h3>2. Ketentuan Boarding &amp; Identitas Penumpang</h3>
+            <p>Penumpang wajib menunjukkan <strong>E-Ticket / Boarding Pass QR</strong> dari menu <em>Tiket Saya</em> beserta kartu identitas asli (KTP/SIM/Paspor) yang sesuai dengan nomor NIK pada tiket. Boarding dibuka 60 menit sebelum jam keberangkatan.</p>
+          </div>
+          <div class="card help-card">
+            <h3>3. Kebijakan Ubah Jadwal (Reschedule)</h3>
+            <p>Anda dapat mengubah tanggal keberangkatan kapan saja sebelum kereta berangkat melalui menu <strong>Tiket Saya &rarr; Ubah Jadwal</strong>. Kursi baru akan disesuaikan secara otomatis pada tanggal keberangkatan yang Anda pilih.</p>
+          </div>
+          <div class="card help-card">
+            <h3>4. Pembatalan Tiket &amp; Pengembalian Dana</h3>
+            <p>Pembatalan tiket dapat dilakukan secara online melalui tombol <strong>Batalkan Tiket</strong> pada detail pesanan. Kuota kursi akan langsung dilepas kembali dan dana dikembalikan sesuai ketentuan yang berlaku.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL 1: LOGIN & REGISTER -->
+  <div id="auth-modal" class="modal-backdrop hidden no-print">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <h3 id="auth-modal-title">Masuk ke Akun KeretaKita</h3>
+        <button type="button" class="modal-close" onclick="closeModal('auth-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="auth-tabs" id="auth-tabs-bar">
+          <button type="button" id="tab-btn-login" class="auth-tab active" onclick="switchAuthMode('login')">Masuk</button>
+          <button type="button" id="tab-btn-register" class="auth-tab" onclick="switchAuthMode('register')">Daftar Member</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" onsubmit="handleLoginSubmit(event)">
+          <div class="form-group">
+            <label for="login-email">Alamat Email</label>
+            <input type="email" id="login-email" class="form-control" placeholder="nama@email.com" required />
+          </div>
+          <div class="form-group">
+            <div class="label-row-between">
+              <label for="login-password">Kata Sandi</label>
+              <button type="button" class="forgot-link-btn" onclick="switchAuthMode('forgot')">
+                Lupa Kata Sandi?
+              </button>
+            </div>
+            <input type="password" id="login-password" class="form-control" placeholder="Masukkan kata sandi" required />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top: 6px;">Masuk ke Akun</button>
+        </form>
+
+        <!-- Forgot / Reset Password Form -->
+        <form id="forgot-form" class="hidden" onsubmit="handleForgotPasswordSubmit(event)">
+          <div class="forgot-info-banner">
+            Verifikasi identitas akun Anda menggunakan <strong>Alamat Email</strong> beserta <strong>Nomor NIK</strong> atau <strong>Nomor HP</strong> yang terdaftar untuk membuat kata sandi baru.
+          </div>
+          <div class="form-group">
+            <label for="forgot-email">Alamat Email Terdaftar</label>
+            <input type="email" id="forgot-email" class="form-control" placeholder="Masukkan email akun Anda" required />
+          </div>
+          <div class="form-group">
+            <label for="forgot-identity">Nomor NIK KTP atau No. WhatsApp/HP Terdaftar</label>
+            <input type="text" id="forgot-identity" class="form-control" placeholder="Masukkan NIK atau No. HP Anda" required />
+          </div>
+          <div class="form-group">
+            <label for="forgot-new-password">Kata Sandi Baru (Min. 6 Karakter)</label>
+            <input type="password" id="forgot-new-password" class="form-control" placeholder="Buat kata sandi baru" minlength="6" required />
+          </div>
+          <div class="form-group">
+            <label for="forgot-confirm-password">Konfirmasi Kata Sandi Baru</label>
+            <input type="password" id="forgot-confirm-password" class="form-control" placeholder="Ulangi kata sandi baru" minlength="6" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Simpan Kata Sandi Baru</button>
+          <button type="button" class="btn btn-outline btn-block" style="margin-top: 8px;" onclick="switchAuthMode('login')">
+            &larr; Kembali ke Halaman Masuk
+          </button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" class="hidden" onsubmit="handleRegisterSubmit(event)">
+          <div class="form-group">
+            <label for="reg-name">Nama Lengkap (Sesuai KTP / Paspor)</label>
+            <input type="text" id="reg-name" class="form-control" placeholder="Contoh: Andi Pratama" required />
+          </div>
+          <div class="form-group">
+            <label for="reg-nik">Nomor Induk Kependudukan (NIK 16 Digit)</label>
+            <input type="text" id="reg-nik" class="form-control" placeholder="Masukkan nomor NIK KTP" minlength="8" maxlength="20" required />
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="reg-email">Alamat Email</label>
+              <input type="email" id="reg-email" class="form-control" placeholder="andi@email.com" required />
+            </div>
+            <div class="form-group">
+              <label for="reg-phone">Nomor WhatsApp / HP</label>
+              <input type="text" id="reg-phone" class="form-control" placeholder="0812xxxxxxx" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Buat Kata Sandi (Min. 6 karakter)</label>
+            <input type="password" id="reg-password" class="form-control" placeholder="Minimal 6 karakter" minlength="6" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Daftar &amp; Dapatkan 500 RailPoints</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: PROFIL & PENUMPANG TERSIMPAN -->
+  <div id="profile-modal" class="modal-backdrop hidden no-print">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <h3>Profil Member &amp; Daftar Penumpang Tersimpan</h3>
+        <button type="button" class="modal-close" onclick="closeModal('profile-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="profile-loyalty-banner" class="loyalty-banner"></div>
+
+        <form id="profile-form" onsubmit="handleProfileUpdate(event)" style="margin-bottom: 20px;">
+          <h4 style="margin-bottom: 10px; color: var(--navy-900);">Data Diri Utama</h4>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label for="prof-name">Nama Lengkap</label>
+              <input type="text" id="prof-name" class="form-control form-control-sm" required />
+            </div>
+            <div class="form-group">
+              <label for="prof-nik">Nomor NIK KTP</label>
+              <input type="text" id="prof-nik" class="form-control form-control-sm" required />
+            </div>
+            <div class="form-group">
+              <label for="prof-phone">No. Telepon</label>
+              <input type="text" id="prof-phone" class="form-control form-control-sm" required />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-sm btn-primary">Simpan Perubahan Profil</button>
+        </form>
+
+        <div class="saved-pax-section">
+          <h4 style="margin-bottom: 6px; color: var(--navy-900);">Daftar Penumpang Tersimpan (Keluarga &amp; Kerabat)</h4>
+          <p class="text-sm text-muted" style="margin-bottom: 12px;">Gunakan daftar ini untuk mengisi identitas penumpang hanya dengan 1 klik saat memesan tiket.</p>
+          <div id="saved-passengers-list" class="saved-pax-list"></div>
+
+          <form onsubmit="handleAddSavedPassenger(event)" class="add-saved-pax-form">
+            <div class="form-row-3">
+              <input type="text" id="new-saved-name" class="form-control form-control-sm" placeholder="Nama Lengkap" required />
+              <input type="text" id="new-saved-nik" class="form-control form-control-sm" placeholder="Nomor NIK" required />
+              <div style="display:flex; gap:6px;">
+                <select id="new-saved-type" class="form-control form-control-sm">
+                  <option value="Dewasa">Dewasa</option>
+                  <option value="Anak">Anak</option>
+                  <option value="Lansia">Lansia</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-outline">+ Tambah</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: PEMESANAN TIKET & PEMILIHAN KURSI (BOOKING WIZARD) -->
+  <div id="booking-modal" class="modal-backdrop hidden no-print">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-header">
+        <div>
+          <h3>Pemesanan Tiket &amp; Pemilihan Kursi Kereta</h3>
+          <p id="booking-modal-subtitle" class="text-muted text-sm"></p>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('booking-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="booking-form" onsubmit="handleBookingSubmit(event)">
+          <div class="booking-layout">
+            <!-- Left Column -->
+            <div class="booking-left-col">
+              <!-- Selected Train Summary -->
+              <div id="booking-train-summary" class="selected-train-box"></div>
+
+              <!-- Contact Information -->
+              <div class="form-section-box">
+                <h4>1. Detail Kontak Pemesan (Pengiriman E-Ticket)</h4>
+                <div class="form-row-3">
+                  <div class="form-group">
+                    <label for="contact-name">Nama Lengkap Pemesan</label>
+                    <input type="text" id="contact-name" class="form-control" placeholder="Nama lengkap" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="contact-email">Alamat Email Aktif</label>
+                    <input type="email" id="contact-email" class="form-control" placeholder="nama@email.com" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="contact-phone">Nomor WhatsApp / HP</label>
+                    <input type="text" id="contact-phone" class="form-control" placeholder="0812xxxxxxx" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Passenger Details & Add-ons -->
+              <div class="form-section-box">
+                <div class="section-box-header">
+                  <div>
+                    <h4>2. Data Penumpang, Kursi &amp; Kuliner Perjalanan</h4>
+                    <p class="text-sm text-muted">Klik kartu penumpang untuk memilih nomor kursi pada denah gerbong di sebelah kanan.</p>
+                  </div>
+                  <div class="passenger-counter-ctrl">
+                    <button type="button" class="btn btn-sm btn-outline" onclick="changeBookingPassengerCount(-1)">- Kurangi</button>
+                    <span id="booking-pax-count-label">1 Penumpang</span>
+                    <button type="button" class="btn btn-sm btn-outline" onclick="changeBookingPassengerCount(1)">+ Tambah</button>
+                  </div>
+                </div>
+
+                <!-- Saved Passengers Quick Fill Bar -->
+                <div id="booking-saved-pax-bar" class="saved-pax-quickbar"></div>
+
+                <div id="booking-passengers-container" class="passengers-form-list">
+                  <!-- Rendered dynamically by JS -->
+                </div>
+              </div>
+
+              <!-- Payment & Promo Voucher Section -->
+              <div class="form-section-box">
+                <h4>3. Metode Pembayaran &amp; Voucher Promo</h4>
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label for="booking-payment-method">Metode Pembayaran</label>
+                    <select id="booking-payment-method" class="form-control" required>
+                      <option value="QRIS Instan">QRIS Instan (Semua Bank &amp; E-Wallet)</option>
+                      <option value="Virtual Account BCA">BCA Virtual Account</option>
+                      <option value="Virtual Account Mandiri">Mandiri Virtual Account</option>
+                      <option value="Virtual Account BRI">BRI Virtual Account</option>
+                      <option value="Virtual Account BNI">BNI Virtual Account</option>
+                      <option value="GoPay / OVO / ShopeePay">E-Wallet (GoPay / OVO / ShopeePay)</option>
+                      <option value="Gerai Indomaret / Alfamart">Gerai Retail (Indomaret / Alfamart)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="booking-promo-input">Kode Promo / Voucher Diskon</label>
+                    <div class="promo-input-row">
+                      <input
+                        type="text"
+                        id="booking-promo-input"
+                        class="form-control"
+                        placeholder="Contoh: KERETAHEMAT"
+                      />
+                      <button type="button" class="btn btn-outline" onclick="applyBookingPromo()">Gunakan</button>
+                    </div>
+                    <div class="promo-quick-chips">
+                      <button type="button" class="chip-btn" onclick="quickPickPromo('KERETAHEMAT')">KERETAHEMAT (-Rp 50rb)</button>
+                      <button type="button" class="chip-btn" onclick="quickPickPromo('RAILTRIP15')">RAILTRIP15 (-15%)</button>
+                      <button type="button" class="chip-btn" onclick="quickPickPromo('WEEKENDKAI')">WEEKENDKAI (-Rp 35rb)</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Interactive Train Carriage & Seat Map -->
+            <div class="booking-right-col">
+              <div class="seat-map-card">
+                <div class="seat-map-header">
+                  <h4>Pilih Kursi di Denah Gerbong</h4>
+                  <p class="text-sm text-muted">
+                    Pilih gerbong dan klik nomor kursi yang masih kosong untuk penumpang yang aktif.
+                  </p>
+                </div>
+
+                <!-- Active Passenger Selector for Seat Map -->
+                <div id="seat-map-passenger-tabs" class="seat-pax-tabs"></div>
+
+                <!-- Carriage Selector -->
+                <div class="carriage-selector">
+                  <span>Gerbong Kereta:</span>
+                  <div id="carriage-buttons" class="carriage-btn-group">
+                    <button type="button" class="carriage-btn active" onclick="selectCarriage(1)">Gerbong 1</button>
+                    <button type="button" class="carriage-btn" onclick="selectCarriage(2)">Gerbong 2</button>
+                    <button type="button" class="carriage-btn" onclick="selectCarriage(3)">Gerbong 3</button>
+                  </div>
+                </div>
+
+                <!-- Seat Legend -->
+                <div class="seat-legend">
+                  <span class="seat-legend-item"><span class="seat-swatch available"></span> Tersedia</span>
+                  <span class="seat-legend-item"><span class="seat-swatch selected"></span> Kursi Anda</span>
+                  <span class="seat-legend-item"><span class="seat-swatch occupied"></span> Sudah Terisi</span>
+                </div>
+
+                <!-- Visual Train Interior Layout -->
+                <div class="train-cabin">
+                  <div class="cabin-front">LOKOMOTIF / ARAH LAJU KERETA &uarr;</div>
+                  <div class="cabin-columns-header">
+                    <span>Jendela (A)</span>
+                    <span>Lorong (B)</span>
+                    <span class="aisle-label">LORONG</span>
+                    <span>Lorong (C)</span>
+                    <span>Jendela (D)</span>
+                  </div>
+                  <div id="seat-grid-container" class="seat-rows-container">
+                    <!-- Rendered by JS -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Price Summary & Submit -->
+              <div class="booking-checkout-box">
+                <div class="price-breakdown">
+                  <div class="price-row">
+                    <span>Harga Tiket (<span id="checkout-pax-count">1 Orang</span>)</span>
+                    <strong id="checkout-base-price">Rp 0</strong>
+                  </div>
+                  <div class="price-row">
+                    <span>Kuliner &amp; Perlindungan Perjalanan</span>
+                    <strong id="checkout-addons-price">Rp 0</strong>
+                  </div>
+                  <div class="price-row discount-row" id="checkout-discount-row">
+                    <span>Potongan Promo (<span id="checkout-promo-code">-</span>)</span>
+                    <strong id="checkout-discount-amount">- Rp 0</strong>
+                  </div>
+                  <div class="price-row total">
+                    <span>Total Pembayaran</span>
+                    <strong id="checkout-total-price">Rp 0</strong>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-accent btn-lg btn-block">
+                  Lanjutkan ke Pembayaran &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: PAYMENT GATEWAY CHECKOUT -->
+  <div id="payment-modal" class="modal-backdrop hidden no-print">
+    <div class="modal-dialog modal-md">
+      <div class="modal-header">
+        <h3>Selesaikan Pembayaran Tiket</h3>
+        <button type="button" class="modal-close" onclick="closeModal('payment-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="payment-modal-body">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="modal-footer" id="payment-modal-footer">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: E-TICKET / BOARDING PASS VIEW -->
+  <div id="eticket-modal" class="modal-backdrop hidden">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header no-print">
+        <h3>E-Ticket &amp; Boarding Pass Resmi</h3>
+        <button type="button" class="modal-close" onclick="closeModal('eticket-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="eticket-modal-content">
+        <!-- Populated by JS -->
+      </div>
+      <div class="modal-footer no-print" id="eticket-modal-actions">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 6: RESCHEDULE (UBAH TANGGAL KEBERANGKATAN) -->
+  <div id="reschedule-modal" class="modal-backdrop hidden no-print">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <h3>Ubah Jadwal Keberangkatan (Reschedule)</h3>
+        <button type="button" class="modal-close" onclick="closeModal('reschedule-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="reschedule-form" onsubmit="handleRescheduleSubmit(event)">
+          <input type="hidden" id="reschedule-booking-code" />
+          <p class="text-sm text-muted" style="margin-bottom: 12px;">
+            Pilih tanggal keberangkatan baru untuk pesanan <strong id="reschedule-pnr-label"></strong>:
+          </p>
+          <div class="form-group">
+            <label for="reschedule-new-date">Tanggal Keberangkatan Baru</label>
+            <input type="date" id="reschedule-new-date" class="form-control" required />
+          </div>
+          <div class="modal-footer-inline">
+            <button type="button" class="btn btn-outline" onclick="closeModal('reschedule-modal')">Batal</button>
+            <button type="submit" class="btn btn-primary">Simpan Jadwal Baru</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer no-print">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand-title" style="color: var(--navy-900); margin-bottom: 6px;">
+          Kereta<span class="brand-accent">Kita</span>
+        </div>
+        <p class="text-sm text-muted">
+          Platform pemesanan tiket transportasi kereta api nasional dengan layanan pemilihan kursi gerbong real-time, pre-order kuliner restorasi, dan penerbitan Boarding Pass instan.
+        </p>
+      </div>
+      <div>
+        <h4>Layanan Utama</h4>
+        <ul class="footer-list">
+          <li><button type="button" class="link-btn" onclick="switchTab('search')">Pesan Tiket Kereta Api</button></li>
+          <li><button type="button" class="link-btn" onclick="switchTab('schedules')">Direktori Jadwal &amp; Rute</button></li>
+          <li><button type="button" class="link-btn" onclick="switchTab('promos')">Promo &amp; Voucher Perjalanan</button></li>
+          <li><button type="button" class="link-btn" onclick="switchTab('my-tickets')">Cek Kode Booking &amp; Boarding Pass</button></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Hubungi Kami</h4>
+        <ul class="footer-list text-sm text-muted">
+          <li>Contact Center: 121 / (021) 121</li>
+          <li>WhatsApp Resmi: 0811-1211-1121</li>
+          <li>Email: cs@keretakita.id</li>
+          <li>Operasional: 24 Jam Setiap Hari</li>
+        </ul>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span class="text-sm text-muted">&copy; 2026 PT KeretaKita Indonesia. Seluruh hak cipta dilindungi undang-undang.</span>
+    </div>
+  </footer>
+
+  <script src="/app.js?v=4"></script>
+</body>
+</html>
